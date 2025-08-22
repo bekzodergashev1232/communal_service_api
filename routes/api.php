@@ -10,9 +10,11 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
 
+//Auth
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+//get all users
 Route::get('/users', [PublicController::class, 'getAllUsers']);
 
 // Kommunal
