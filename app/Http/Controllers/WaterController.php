@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\IssiqSuvService;
 use App\Services\UserDebtService;
+use App\Helpers\ApiResponse;
 
 class WaterController extends Controller
 {
@@ -17,7 +18,12 @@ class WaterController extends Controller
             'price'         => 'nullable|numeric',
         ]);
 
-        return response()->json($service->create($validated), 201);
+        try {
+            $data = $service->create($validated);
+            return ApiResponse::success($data, 'Issiq suv maʼlumotlari qo‘shildi', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Issiq suv qo‘shishda xatolik: ' . $e->getMessage(), 500);
+        }
     }
 
     public function createUserDebt(Request $request, UserDebtService $service)
@@ -28,6 +34,11 @@ class WaterController extends Controller
             'debt_amount' => 'required|numeric',
         ]);
 
-        return response()->json($service->create($validated), 201);
+        try {
+            $data = $service->create($validated);
+            return ApiResponse::success($data, 'Foydalanuvchining qarzdorligi qo‘shildi', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('Qarzdorlikni qo‘shishda xatolik: ' . $e->getMessage(), 500);
+        }
     }
 }

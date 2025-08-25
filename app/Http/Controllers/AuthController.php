@@ -5,30 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\ApiResponse;
 
 class AuthController extends Controller
 {
-    //register
+    // Register
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|string',
+            'name'                => 'required|string|max:255',
+            'email'               => 'required|email|max:255|unique:users',
+            'password'            => 'required|string',
             'count_family_member' => 'required|integer|min:2',
         ]);
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-            'count_family_member' => $validatedData['count_family_member'],
-        ]);
-        return response()->json([
-            'message' => 'User created successfully.',
-            'user' => $user,
-        ]);
+
+        try {
+            $user = User::create([
+                'name'                => $validatedData['name'],
+                'email'               => $validatedData['email'],
+                'password'            => bcrypt($validatedData['password']),
+                'count_family_member' => $validatedData['count_family_member'],
+            ]);
+
+            return ApiResponse::success($user, 'User created successfully.', 201);
+        } catch (\Exception $e) {
+            return ApiResponse::error('User create failed: ' . $e->getMessage(), 500);
+        }
     }
 
+    // Login
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -37,16 +42,15 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid login details'], 401);
+            return ApiResponse::error('Invalid login details', 401);
         }
 
         $user  = Auth::user();
         $token = $user->createToken('API Token')->accessToken;
 
-        return response()->json([
-            'message' => 'Login successful',
-            'user'    => $user,
-            'token'   => $token,
-        ]);
+        return ApiResponse::success([
+            'user'  => $user,
+            'token' => $token,
+        ], 'Login successful');
     }
 }

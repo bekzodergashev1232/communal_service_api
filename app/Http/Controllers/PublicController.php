@@ -2,31 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
 use App\Models\User;
 use App\Services\CommunalService;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
-    protected $communalService;
+    protected CommunalService $communalService;
 
     public function __construct(CommunalService $communalService)
     {
         $this->communalService = $communalService;
     }
-    public function getAllUsers(Request $request){
-        return User::all();
+
+    public function getAllUsers()
+    {
+        $users = User::all();
+        return ApiResponse::success($users, 'Foydalanuvchilar ro‘yxati');
     }
 
-    //communal lar uchun
+    // Barcha userlar bo‘yicha communal
     public function getCommunalMonth()
     {
-        return response()->json($this->communalService->getComunalMonthAllUsers());
+        $data = $this->communalService->getComunalMonthAllUsers();
+        return ApiResponse::success($data, 'Barcha foydalanuvchilar uchun kommunal hisob-kitob');
     }
 
+    // Bitta user bo‘yicha communal
     public function getCommunalMonthById(int $user_id)
     {
-        return response()->json($this->communalService->getCommunalMonthById($user_id));
+        $data = $this->communalService->getCommunalMonthById($user_id);
+        return ApiResponse::success($data, "Foydalanuvchi #$user_id uchun kommunal hisob-kitob");
     }
-
 }

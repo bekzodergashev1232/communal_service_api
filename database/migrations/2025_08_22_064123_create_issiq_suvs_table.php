@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->boolean('is_counter')->default(false);
             $table->decimal('water_counter',8,2)->nullable();
-            $table->decimal('price',8,2)->default(5600)->nullable();
+            $table->decimal('price',8,2)->default(5600);
             $table->timestamps();
         });
     }

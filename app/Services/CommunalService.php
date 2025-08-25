@@ -31,9 +31,10 @@ class CommunalService
                 ? 'Suv hisoblagich bor'
                 : 'Suv hisoblagich yo‘q';
         }
+        $days = now()->day;
 
         // isitish
-        $total_payment_heating = 22 * 480 * $user->count_family_member;
+        $total_payment_heating = $days * 480 * $user->count_family_member;
 
         // umumiy
         $total_payment = $total_payment_suv + $total_payment_heating + $debt;
@@ -47,6 +48,13 @@ class CommunalService
             'FromTo'                => now()->startOfMonth()->format('d.m.Y') . ' to ' . now()->format('d.m.Y'),
             'Total_payment'         => $total_payment,
         ];
+    }
+
+    public function getComunalMonthAllUsers(): array
+    {
+        return User::all()->map(function ($user) {
+            return $this->getCommunalMonthById($user->id);
+        })->toArray();
     }
 
     /*  public function getCommunalMonthById(int $user_id): array
@@ -82,10 +90,5 @@ class CommunalService
           ];
       }*/
 
-    public function getComunalMonthAllUsers(): array
-    {
-        return User::all()->map(function ($user) {
-            return $this->getCommunalMonthById($user->id);
-        })->toArray();
-    }
+
 }
